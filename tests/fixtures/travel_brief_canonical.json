@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "duration_days": 5,
+  "destinations": [
+    { "city": "Tokyo", "country": "Japan", "days": 3 },
+    { "city": "Kyoto", "country": "Japan", "days": 2 }
+  ],
+  "budget": { "amount": 3000, "currency": "USD", "flexibility": "strict" },
+  "preferences": ["food", "temples"],
+  "anti_preferences": ["crowds"],
+  "pace": "moderate",
+  "party_size": 2,
+  "notes": [],
+  "warnings": []
+}

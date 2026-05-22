@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "status": "pass_with_gaps",
+  "checks": [
+    { "id": "duration", "ok": true },
+    { "id": "cities_covered", "ok": true },
+    { "id": "budget_discussed", "ok": true },
+    { "id": "food_referenced", "ok": true },
+    { "id": "temples_referenced", "ok": true },
+    { "id": "crowd_mitigation", "ok": true },
+    { "id": "day_by_day_present", "ok": true },
+    { "id": "lodging_present", "ok": true },
+    { "id": "logistics_present", "ok": true }
+  ],
+  "gaps": []
+}

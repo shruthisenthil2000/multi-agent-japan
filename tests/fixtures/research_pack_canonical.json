@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "cities": {
+    "Tokyo": {
+      "activities": [
+        {
+          "name": "Senso-ji",
+          "type": "temple",
+          "crowd_level": "high",
+          "suggested_timing": "early_morning",
+          "why": "Quieter before 8am",
+          "data_confidence": "inferred"
+        },
+        {
+          "name": "Tsukiji Outer Market",
+          "type": "food",
+          "crowd_level": "medium",
+          "suggested_timing": "morning",
+          "why": "Street food breakfast",
+          "data_confidence": "inferred"
+        }
+      ],
+      "food_areas": ["Tsukiji Outer", "Shimokitazawa"]
+    },
+    "Kyoto": {
+      "activities": [
+        {
+          "name": "Fushimi Inari",
+          "type": "temple",
+          "crowd_level": "high",
+          "suggested_timing": "early_morning",
+          "why": "Avoid midday crowds",
+          "data_confidence": "inferred"
+        }
+      ],
+      "food_areas": ["Nishiki Market", "Gion"]
+    }
+  },
+  "sources": [],
+  "warnings": ["Plan based on model knowledge; not verified against live sources."],
+  "data_confidence": "inferred"
+}

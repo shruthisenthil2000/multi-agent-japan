@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "cities": {
+    "Tokyo": [
+      {
+        "neighborhood": "Asakusa",
+        "pros": ["Temple proximity", "Budget-friendly"],
+        "cons": ["Far from nightlife"],
+        "fit_score": 0.85,
+        "data_confidence": "inferred"
+      },
+      {
+        "neighborhood": "Shinjuku",
+        "pros": ["Transit hub", "Food options"],
+        "cons": ["Busy area"],
+        "fit_score": 0.7,
+        "data_confidence": "inferred"
+      }
+    ],
+    "Kyoto": [
+      {
+        "neighborhood": "Gion",
+        "pros": ["Traditional streets", "Temple access"],
+        "cons": ["Tourist crowds evening"],
+        "fit_score": 0.8,
+        "data_confidence": "inferred"
+      },
+      {
+        "neighborhood": "Kyoto Station",
+        "pros": ["Shinkansen access", "Budget hotels"],
+        "cons": ["Less atmospheric"],
+        "fit_score": 0.75,
+        "data_confidence": "inferred"
+      }
+    ]
+  },
+  "warnings": ["Plan based on model knowledge; not verified against live sources."],
+  "data_confidence": "inferred"
+}

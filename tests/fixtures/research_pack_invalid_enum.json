@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "cities": {
+    "Tokyo": {
+      "activities": [
+        {
+          "name": "Test",
+          "type": "temple",
+          "crowd_level": "extreme",
+          "suggested_timing": "early_morning",
+          "why": "test"
+        }
+      ],
+      "food_areas": []
+    }
+  }
+}
