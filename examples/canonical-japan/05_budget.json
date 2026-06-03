@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "total": {
+    "amount": 3000.0,
+    "currency": "USD",
+    "flexibility": null
+  },
+  "categories": [
+    {
+      "name": "Intercity Transport",
+      "amount": 330.0,
+      "percent": 11.0
+    },
+    {
+      "name": "Lodging",
+      "amount": 900.0,
+      "percent": 30.0
+    },
+    {
+      "name": "Food",
+      "amount": 750.0,
+      "percent": 25.0
+    },
+    {
+      "name": "Local Transport",
+      "amount": 300.0,
+      "percent": 10.0
+    },
+    {
+      "name": "Activities",
+      "amount": 570.0,
+      "percent": 19.0
+    },
+    {
+      "name": "Buffer",
+      "amount": 150.0,
+      "percent": 5.0
+    }
+  ],
+  "tradeoffs": [],
+  "warnings": [
+    "Plan based on model knowledge; not verified against live sources.",
+    "LLM-only warning: Please verify the plan with live sources before finalizing.",
+    "LLM-only warning: Budget estimates are based on general knowledge and may vary with real-time prices."
+  ],
+  "data_confidence": "typical"
+}

@@ -312,9 +312,19 @@ flowchart TB
 
 ### Exit criteria
 
-- [ ] All problem statement acceptance criteria met
-- [ ] `trace.jsonl` shows ≥6 steps (intent, 4 specialists, merge, validate)
-- [ ] README states deferred items: MCP, KB, FX (Phase L+)
+- [x] All problem statement acceptance criteria met
+- [x] `trace.jsonl` shows ≥6 steps (intent, 4 specialists, merge, validate)
+- [x] README states deferred items: MCP, KB, FX (Phase L+)
+
+### Phase 2 deliverables (completed)
+
+| # | Artifact |
+|---|----------|
+| 2.1 | `tests/test_intent_parser.py`, `tests/test_schemas.py` |
+| 2.2 | `tests/test_pipeline_integration.py`, `tests/test_acceptance.py` (mock / file-only) |
+| 2.3 | `examples/canonical-japan/` (from run `596da9cd4964`) |
+| 2.4 | `README.md`, `examples/canonical-japan/README.md` |
+| 2.5 | Acceptance criteria checked in `problemstatement.md` |
 
 ---
 
@@ -577,6 +587,7 @@ Track at end of **Phase 2**:
 | 2026-05-20 | Added edgecase.md + evals.yaml cross-reference |
 | 2026-05-20 | **Two-brain routing:** Groq (research, lodging, logistics, intent, merge); Gemini (budget, validator) |
 | 2026-05-20 | Documented Groq/Gemini rate limits; `rate_limits.py` + `rate_limiter.py` for Phase 1 |
+| 2026-05-22 | Phase 2 complete: golden example, acceptance tests, docs (no test run in CI by default) |
 
 ---
 

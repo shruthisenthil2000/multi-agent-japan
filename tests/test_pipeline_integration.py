@@ -1,9 +1,11 @@
+"""Pipeline integration tests — mock LLM only (no API keys / quota)."""
+
 import json
 from pathlib import Path
 
 import pytest
 
-from orchestrator.config import get_settings
+from orchestrator.config import AGENT_PROVIDERS, get_settings
 from orchestrator.pipeline import plan_trip_sync
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -47,6 +49,7 @@ def test_plan_trip_e2e_mock(
     assert "intent_parser" in steps
     assert "budget" in steps
     assert "validator" in steps
+    assert len(trace_lines) >= 6
 
 
 def test_plan_trip_rejects_empty(disable_rate_limit):
@@ -54,8 +57,33 @@ def test_plan_trip_rejects_empty(disable_rate_limit):
         plan_trip_sync("   ")
 
 
-def test_agent_providers():
-    from orchestrator.config import AGENT_PROVIDERS
-
+def test_agent_providers_two_brain():
     assert AGENT_PROVIDERS["budget"] == "gemini"
+    assert AGENT_PROVIDERS["validator"] == "gemini"
     assert AGENT_PROVIDERS["destination_researcher"] == "groq"
+    assert AGENT_PROVIDERS["lodging"] == "groq"
+    assert AGENT_PROVIDERS["logistics"] == "groq"
+    assert AGENT_PROVIDERS["merge"] == "groq"
+
+
+def test_all_artifacts_written(mock_completion_fn, canonical_request, disable_rate_limit, tmp_path):
+    result = plan_trip_sync(
+        canonical_request,
+        run_id="artifacts-check",
+        completion_fn=mock_completion_fn,
+        runs_base_dir=tmp_path / "runs",
+    )
+    run_dir = Path(result.run_dir)
+    for key in (
+        "00_request.txt",
+        "01_travel_brief.json",
+        "02_research.json",
+        "03_lodging.json",
+        "04_logistics.json",
+        "05_budget.json",
+        "06_draft_itinerary.md",
+        "07_validation.json",
+        "08_final_itinerary.md",
+        "trace.jsonl",
+    ):
+        assert (run_dir / key).exists(), key

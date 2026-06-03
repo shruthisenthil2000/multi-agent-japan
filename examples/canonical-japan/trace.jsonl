@@ -1,0 +1,8 @@
+{"ts": "2026-05-22T15:17:31Z", "step": "intent_parser", "status": "ok", "duration_ms": 2967.9}
+{"ts": "2026-05-22T15:17:34Z", "step": "destination_researcher", "status": "ok", "provider": "groq", "model": "llama-3.3-70b-versatile"}
+{"ts": "2026-05-22T15:17:37Z", "step": "lodging", "status": "ok", "provider": "groq", "model": "llama-3.3-70b-versatile"}
+{"ts": "2026-05-22T15:17:38Z", "step": "logistics", "status": "ok", "provider": "groq", "model": "llama-3.3-70b-versatile"}
+{"ts": "2026-05-22T15:17:38Z", "step": "specialists_parallel", "status": "ok", "duration_ms": 7670.4}
+{"ts": "2026-05-22T15:17:54Z", "step": "budget", "status": "ok", "duration_ms": 15063.4}
+{"ts": "2026-05-22T15:17:55Z", "step": "merge", "status": "ok", "duration_ms": 1522.1}
+{"ts": "2026-05-22T15:18:04Z", "step": "validator", "status": "ok", "duration_ms": 8510.3}

@@ -1,0 +1,99 @@
+{
+  "schema_version": "1.0",
+  "cities": {
+    "Tokyo": {
+      "activities": [
+        {
+          "name": "Meiji Shrine",
+          "type": "temple",
+          "crowd_level": "low",
+          "suggested_timing": "early_morning",
+          "why": "Avoid crowds by visiting early in the morning",
+          "data_confidence": "inferred"
+        },
+        {
+          "name": "Tsukiji Outer Market",
+          "type": "food",
+          "crowd_level": "medium",
+          "suggested_timing": "morning",
+          "why": "Fresh sushi and seafood are best enjoyed in the morning",
+          "data_confidence": "inferred"
+        },
+        {
+          "name": "Shibuya Crossing",
+          "type": "landmark",
+          "crowd_level": "high",
+          "suggested_timing": "evening",
+          "why": "Experience the famous scramble crossing at night",
+          "data_confidence": "inferred"
+        },
+        {
+          "name": "Senso-ji Temple",
+          "type": "temple",
+          "crowd_level": "medium",
+          "suggested_timing": "afternoon",
+          "why": "Explore the historic temple and surrounding Nakamise shopping street",
+          "data_confidence": "inferred"
+        },
+        {
+          "name": "Imperial Palace",
+          "type": "landmark",
+          "crowd_level": "low",
+          "suggested_timing": "morning",
+          "why": "Take a stroll around the beautiful palace grounds",
+          "data_confidence": "inferred"
+        }
+      ],
+      "food_areas": [
+        "Shibuya",
+        "Shinjuku",
+        "Asakusa"
+      ]
+    },
+    "Kyoto": {
+      "activities": [
+        {
+          "name": "Fushimi Inari Shrine",
+          "type": "temple",
+          "crowd_level": "medium",
+          "suggested_timing": "early_morning",
+          "why": "Hike the famous orange torii gate trail",
+          "data_confidence": "inferred"
+        },
+        {
+          "name": "Kinkaku-ji Temple",
+          "type": "temple",
+          "crowd_level": "medium",
+          "suggested_timing": "afternoon",
+          "why": "Admire the stunning golden pavilion",
+          "data_confidence": "inferred"
+        },
+        {
+          "name": "Arashiyama Bamboo Grove",
+          "type": "nature",
+          "crowd_level": "low",
+          "suggested_timing": "morning",
+          "why": "Take a peaceful walk through the bamboo forest",
+          "data_confidence": "inferred"
+        },
+        {
+          "name": "Nijo Castle",
+          "type": "landmark",
+          "crowd_level": "low",
+          "suggested_timing": "afternoon",
+          "why": "Explore the historic castle and its 'nightingale floors'",
+          "data_confidence": "inferred"
+        }
+      ],
+      "food_areas": [
+        "Gion",
+        "Kawaramachi"
+      ]
+    }
+  },
+  "sources": [],
+  "warnings": [
+    "Plan based on model knowledge; not verified against live sources."
+  ],
+  "data_confidence": "inferred"
+}

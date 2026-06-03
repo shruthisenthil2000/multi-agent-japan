@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Travel Planner</title>
+  <meta name="description" content="Multi-Agent Trip Generation System">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <h1 class="header-title">AI Travel Planner</h1>
+      <p class="header-subtitle">Multi-Agent Trip Generation System</p>
+    </div>
+  </header>
+
+  <main>
+    
+    <!-- Input Section -->
+    <section class="input-section">
+      <div class="input-container">
+        <textarea 
+          id="travel-request" 
+          class="travel-input" 
+          rows="4" 
+          placeholder="Describe your trip..."
+        ></textarea>
+        
+        <div class="input-footer">
+          <div class="input-controls">
+            <button id="mic-btn" class="mic-button" title="Voice input">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                <path d="M19 10v1a7 7 0 0 1-14 0v-1"></path>
+                <line x1="12" x2="12" y1="19" y2="22"></line>
+              </svg>
+            </button>
+            <select id="currency-select" class="currency-select">
+              <option value="USD">USD</option>
+              <option value="INR">INR</option>
+              <option value="JPY">JPY</option>
+            </select>
+          </div>
+          <button id="generate-btn" class="generate-button">
+            Generate Plan
+          </button>
+        </div>
+
+        <div class="example-prompts">
+          <span class="example-label">Try:</span>
+          <button class="example-chip" data-prompt="Plan a 5-day trip to Japan. Tokyo + Kyoto. $3000 budget. Love food and temples, hate crowds.">
+            Japan trip
+          </button>
+          <button class="example-chip" data-prompt="Plan a 3-day trip to Paris. $2000 budget. Love art and museums.">
+            Paris getaway
+          </button>
+          <button class="example-chip" data-prompt="Plan a 7-day trip to Thailand. Bangkok and beaches. $2500 budget. Adventure focused.">
+            Thailand adventure
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Workflow Stepper -->
+    <section class="workflow-section" id="workflow-section" style="display: none;">
+      <div class="workflow-container">
+        <div class="stepper">
+          <div class="step" data-step="request">
+            <div class="step-dot"></div>
+            <span class="step-label">Request</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="intent">
+            <div class="step-dot"></div>
+            <span class="step-label">Intent</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="research">
+            <div class="step-dot"></div>
+            <span class="step-label">Research</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="budget">
+            <div class="step-dot"></div>
+            <span class="step-label">Budget</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="logistics">
+            <div class="step-dot"></div>
+            <span class="step-label">Logistics</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="validator">
+            <div class="step-dot"></div>
+            <span class="step-label">Validator</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="output">
+            <div class="step-dot"></div>
+            <span class="step-label">Output</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Output Section -->
+    <section class="output-section" id="output-section" style="display: none;">
+      <div class="output-container">
+        
+        <!-- Trip Summary Card -->
+        <div class="card trip-summary-card">
+          <div class="card-header">
+            <h2 class="card-title">Trip Summary</h2>
+          </div>
+          <div class="trip-summary-content">
+            <div class="trip-main">
+              <h3 class="trip-destination" id="trip-destination">Destination</h3>
+              <div class="trip-meta">
+                <span id="trip-duration">0 Days</span>
+                <span class="separator">•</span>
+                <span id="trip-budget">$0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Budget Breakdown Card -->
+        <div class="card budget-card">
+          <div class="card-header">
+            <h2 class="card-title">Budget Breakdown</h2>
+          </div>
+          <div class="budget-table">
+            <div class="budget-row">
+              <span class="budget-label">Lodging</span>
+              <span class="budget-value" id="budget-lodging">$0</span>
+            </div>
+            <div class="budget-row">
+              <span class="budget-label">Dining</span>
+              <span class="budget-value" id="budget-dining">$0</span>
+            </div>
+            <div class="budget-row">
+              <span class="budget-label">Transport</span>
+              <span class="budget-value" id="budget-transport">$0</span>
+            </div>
+            <div class="budget-row">
+              <span class="budget-label">Activities</span>
+              <span class="budget-value" id="budget-activities">$0</span>
+            </div>
+            <div class="budget-row budget-total">
+              <span class="budget-label">Total</span>
+              <span class="budget-value" id="budget-total">$0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stay Areas Card -->
+        <div class="card areas-card">
+          <div class="card-header">
+            <h2 class="card-title">Stay Areas</h2>
+          </div>
+          <div class="tags-container" id="areas-tags">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Transport Plan Card -->
+        <div class="card transport-card">
+          <div class="card-header">
+            <h2 class="card-title">Transport Plan</h2>
+          </div>
+          <div class="transport-timeline" id="transport-timeline">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Day-by-Day Itinerary Card -->
+        <div class="card itinerary-card">
+          <div class="card-header">
+            <h2 class="card-title">Itinerary</h2>
+          </div>
+          <div class="itinerary-accordion" id="itinerary-accordion">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Validation Score Card -->
+        <div class="card validation-card">
+          <div class="card-header">
+            <h2 class="card-title">Validation Score</h2>
+          </div>
+          <div class="validation-content">
+            <div class="validation-score">
+              <span class="score-value" id="validation-score">95%</span>
+              <span class="score-label">Constraints Satisfied</span>
+            </div>
+            <div class="validation-details" id="validation-details">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

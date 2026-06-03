@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "transfers": [
+    {
+      "from": "Tokyo",
+      "to": "Kyoto",
+      "day": 3,
+      "mode": "Bullet Train",
+      "duration_minutes": 140,
+      "cost_estimate_usd": {
+        "low": 130.0,
+        "high": 200.0
+      },
+      "notes": "Booking in advance is recommended",
+      "data_confidence": "typical"
+    }
+  ],
+  "sources": [],
+  "warnings": [
+    "Plan based on model knowledge; not verified against live sources.",
+    "LLM-only warning: Please verify the plan with live sources before finalizing."
+  ],
+  "data_confidence": "inferred"
+}

@@ -154,11 +154,13 @@ Optional: `README.md` with how to run; sample output under `docs/` or `examples/
 
 The task is complete when:
 
-- [ ] A user can submit the canonical request (or equivalent) and receive a structured trip plan.
-- [ ] At least **three distinct agent roles** contribute before the final merge (e.g. intent, research, logistics, budget, validation).
-- [ ] Output includes **day-by-day outline**, **stay areas**, **inter-city logistics**, and **budget discussion**.
-- [ ] Final output **references** food, temples, and crowd avoidance from the example request.
-- [ ] Coordinator or validator step confirms alignment with constraints (or lists gaps).
+- [x] A user can submit the canonical request (or equivalent) and receive a structured trip plan.
+- [x] At least **three distinct agent roles** contribute before the final merge (e.g. intent, research, logistics, budget, validation).
+- [x] Output includes **day-by-day outline**, **stay areas**, **inter-city logistics**, and **budget discussion**.
+- [x] Final output **references** food, temples, and crowd avoidance from the example request.
+- [x] Coordinator or validator step confirms alignment with constraints (or lists gaps).
+
+*Verified Phase 2 — live run `596da9cd4964`, golden copy in `examples/canonical-japan/`, mock tests in `tests/`.*
 
 ---
 

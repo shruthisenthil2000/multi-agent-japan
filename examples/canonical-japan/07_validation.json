@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "status": "pass",
+  "checks": [
+    {
+      "id": "duration",
+      "ok": true,
+      "note": "The itinerary correctly covers 5 days as specified in the brief."
+    },
+    {
+      "id": "cities_covered",
+      "ok": true,
+      "note": "Both Tokyo and Kyoto are included and allocated the correct number of days."
+    },
+    {
+      "id": "budget_discussed",
+      "ok": true,
+      "note": "The budget of $3000 USD is explicitly mentioned and allocated."
+    },
+    {
+      "id": "food_referenced",
+      "ok": true,
+      "note": "Food preferences are addressed with mentions of affordable food, fresh sushi, and authentic options."
+    },
+    {
+      "id": "temples_referenced",
+      "ok": true,
+      "note": "Temple preferences are met with visits to Meiji Shrine, Fushimi Inari, Kinkaku-ji, and Nijo Castle."
+    },
+    {
+      "id": "crowd_mitigation",
+      "ok": true,
+      "note": "The itinerary explicitly states 'avoiding crowded areas' and suggests early morning visits to popular sites like Meiji Shrine and Fushimi Inari."
+    },
+    {
+      "id": "day_by_day_present",
+      "ok": true,
+      "note": "A clear day-by-day breakdown for all 5 days is provided."
+    },
+    {
+      "id": "lodging_present",
+      "ok": true,
+      "note": "Specific neighborhood recommendations for lodging in both Tokyo (Shimokitazawa) and Kyoto (Gion) are included."
+    },
+    {
+      "id": "logistics_present",
+      "ok": true,
+      "note": "Intercity travel logistics (Bullet Train from Tokyo to Kyoto, duration, booking recommendation) are detailed."
+    }
+  ],
+  "gaps": []
+}

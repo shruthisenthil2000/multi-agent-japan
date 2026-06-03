@@ -1,0 +1,98 @@
+{
+  "schema_version": "1.0",
+  "cities": {
+    "Tokyo": [
+      {
+        "neighborhood": "Shimokitazawa",
+        "pros": [
+          "affordable food options",
+          "proximity to temples",
+          "moderate transit access"
+        ],
+        "cons": [
+          "some crowds on weekends",
+          "limited high-end dining"
+        ],
+        "fit_score": 0.8,
+        "data_confidence": "inferred"
+      },
+      {
+        "neighborhood": "Asakusa",
+        "pros": [
+          "historic temples",
+          "traditional food options",
+          "convenient transit"
+        ],
+        "cons": [
+          "crowded streets",
+          "higher prices for accommodations"
+        ],
+        "fit_score": 0.7,
+        "data_confidence": "inferred"
+      },
+      {
+        "neighborhood": "Daikanyama",
+        "pros": [
+          "upscale food options",
+          "quiet atmosphere",
+          "some temple access"
+        ],
+        "cons": [
+          "higher prices for accommodations",
+          "limited transit options"
+        ],
+        "fit_score": 0.6,
+        "data_confidence": "inferred"
+      }
+    ],
+    "Kyoto": [
+      {
+        "neighborhood": "Gion",
+        "pros": [
+          "traditional temples",
+          "authentic food options",
+          "scenic atmosphere"
+        ],
+        "cons": [
+          "crowded streets",
+          "higher prices for accommodations"
+        ],
+        "fit_score": 0.9,
+        "data_confidence": "inferred"
+      },
+      {
+        "neighborhood": "Kiyamachi",
+        "pros": [
+          "convenient transit",
+          "variety of food options",
+          "some temple access"
+        ],
+        "cons": [
+          "some crowds",
+          "limited high-end dining"
+        ],
+        "fit_score": 0.8,
+        "data_confidence": "inferred"
+      },
+      {
+        "neighborhood": "Arashiyama",
+        "pros": [
+          "natural scenery",
+          "some temple access",
+          "relatively quiet"
+        ],
+        "cons": [
+          "limited transit options",
+          "fewer food options"
+        ],
+        "fit_score": 0.7,
+        "data_confidence": "inferred"
+      }
+    ]
+  },
+  "warnings": [
+    "LLM-only warning: plan not verified against live sources.",
+    "Plan based on model knowledge; not verified against live sources."
+  ],
+  "data_confidence": "inferred"
+}

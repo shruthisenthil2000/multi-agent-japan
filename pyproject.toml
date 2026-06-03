@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "multi-agent-tokyo"
 version = "0.1.0"
-description = "Travel Planning Multi-Agent System (LLM-only Phase 1)"
+description = "Voice-enabled multi-agent travel planner (Groq + Gemini + Streamlit)"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
@@ -16,10 +16,16 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0", "pytest-asyncio>=0.23"]
+voice = [
+  "streamlit>=1.28",
+  "speechrecognition>=3.10",
+  "pyttsx3>=2.90",
+  "reportlab>=4.0",
+]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["llm*", "orchestrator*", "agents*"]
+include = ["llm*", "orchestrator*", "agents*", "app*"]
 
 [project.scripts]
 plan-trip = "orchestrator.cli:main"
