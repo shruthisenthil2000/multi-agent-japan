@@ -4,11 +4,22 @@
 const CURRENCY_RATES = {
   USD: { rate: 1, symbol: '$', locale: 'en-US' },
   INR: { rate: 83.5, symbol: '₹', locale: 'en-IN' },
-  JPY: { rate: 149.5, symbol: '¥', locale: 'ja-JP' }
+  JPY: { rate: 149.5, symbol: '¥', locale: 'ja-JP' },
+  EUR: { rate: 0.92, symbol: '€', locale: 'de-DE' }
 };
 
 // Current selected currency (default: USD)
 let currentCurrency = 'USD';
+
+// Global flag to prevent feedback loop
+let isSpeaking = false;
+
+// Global state management
+let isListening = false;
+let isProcessing = false;
+
+// Global recognition object for control
+let recognition = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   initCurrencySelector();
@@ -47,59 +58,368 @@ function formatCurrency(amountInUSD) {
   }).format(convertedAmount);
 }
 
+// Initialize map with destination coordinates
+function initMap(destination) {
+  console.log('[MAP] initMap called with destination:', destination);
+  
+  const mapContainer = document.getElementById('map');
+  if (!mapContainer) {
+    console.error('[MAP] Map container not found');
+    return;
+  }
+  
+  console.log('[MAP] Map container found:', mapContainer);
+  console.log('[MAP] Map container dimensions:', mapContainer.offsetWidth, 'x', mapContainer.offsetHeight);
+  
+  // Clear existing map if any
+  if (window.map) {
+    window.map.remove();
+  }
+  
+  // Destination coordinates
+  const coordinates = {
+    'japan': [35.6762, 139.6503], // Tokyo
+    'tokyo': [35.6762, 139.6503],
+    'kyoto': [35.0116, 135.7681],
+    'thailand': [13.7563, 100.5018], // Bangkok
+    'bangkok': [13.7563, 100.5018],
+    'italy': [41.9028, 12.4964], // Rome
+    'rome': [41.9028, 12.4964],
+    'florence': [43.7696, 11.2558],
+    'france': [48.8566, 2.3522], // Paris
+    'paris': [48.8566, 2.3522]
+  };
+  
+  const destLower = destination.toLowerCase();
+  let coords = [20, 0]; // Default coordinates
+  
+  for (const [key, value] of Object.entries(coordinates)) {
+    if (destLower.includes(key)) {
+      coords = value;
+      break;
+    }
+  }
+  
+  console.log('[MAP] Using coordinates:', coords);
+  
+  // Try to initialize map immediately
+  try {
+    console.log('[MAP] Attempting immediate initialization...');
+    window.map = L.map('map').setView(coords, 12);
+    
+    // Add tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(window.map);
+    
+    // Add marker
+    L.marker(coords).addTo(window.map)
+      .bindPopup(destination)
+      .openPopup();
+    
+    console.log('[MAP] Map initialized successfully for destination:', destination);
+  } catch (error) {
+    console.error('[MAP] Error initializing map immediately:', error);
+    console.log('[MAP] Retrying with setTimeout...');
+    
+    // Retry with setTimeout if immediate initialization fails
+    setTimeout(() => {
+      console.log('[MAP] Map container dimensions before retry:', mapContainer.offsetWidth, 'x', mapContainer.offsetHeight);
+      
+      try {
+        window.map = L.map('map').setView(coords, 12);
+        
+        // Add tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(window.map);
+        
+        // Add marker
+        L.marker(coords).addTo(window.map)
+          .bindPopup(destination)
+          .openPopup();
+        
+        // Invalidate size to fix rendering issues
+        setTimeout(() => {
+          window.map.invalidateSize();
+          console.log('[MAP] Map size invalidated');
+        }, 200);
+        
+        console.log('[MAP] Map initialized successfully with setTimeout for destination:', destination);
+      } catch (retryError) {
+        console.error('[MAP] Error initializing map with setTimeout:', retryError);
+        console.error('[MAP] Map container at error time dimensions:', mapContainer.offsetWidth, 'x', mapContainer.offsetHeight);
+      }
+    }, 500);
+  }
+}
+
+// Text-to-speech function using SpeechSynthesis API
+function speakText(text) {
+  console.log('[TTS] speakText called with text:', text);
+  
+  if (!('speechSynthesis' in window)) {
+    console.error('[TTS] Speech synthesis not supported in this browser');
+    return;
+  }
+  
+  console.log('[TTS] Speech synthesis API available');
+
+  // Set speaking flag to prevent feedback loop
+  isSpeaking = true;
+  isProcessing = false;
+  console.log('[VOICE] Speaking started (isSpeaking = true, isProcessing = false)');
+
+  // Stop speech recognition to prevent picking up TTS output
+  if (recognition && isListening) {
+    try {
+      recognition.stop();
+      console.log('[VOICE] Recognition paused during TTS');
+    } catch (error) {
+      console.error('[VOICE] Error stopping recognition:', error);
+    }
+  }
+
+  const micBtn = document.getElementById('mic-btn');
+  if (micBtn) {
+    micBtn.classList.remove('listening', 'processing');
+    micBtn.classList.add('speaking');
+    micBtn.title = 'Speaking...';
+  }
+
+  // Cancel any ongoing speech
+  window.speechSynthesis.cancel();
+  console.log('[TTS] Cancelled any ongoing speech');
+
+  // Get available voices
+  const voices = window.speechSynthesis.getVoices();
+  console.log('[TTS] Available voices:', voices.length);
+  
+  if (voices.length === 0) {
+    console.warn('[TTS] No voices available yet, waiting for voices to load...');
+    
+    // Wait for voices to load
+    window.speechSynthesis.onvoiceschanged = () => {
+      const loadedVoices = window.speechSynthesis.getVoices();
+      console.log('[TTS] Voices loaded:', loadedVoices.length);
+      speakWithVoices(text, loadedVoices, micBtn);
+    };
+    
+    // Fallback: try to speak anyway after a short delay
+    setTimeout(() => {
+      const fallbackVoices = window.speechSynthesis.getVoices();
+      if (fallbackVoices.length > 0) {
+        speakWithVoices(text, fallbackVoices, micBtn);
+      } else {
+        console.warn('[TTS] Still no voices, attempting to speak without voice selection');
+        speakWithVoices(text, [], micBtn);
+      }
+    }, 500);
+  } else {
+    speakWithVoices(text, voices, micBtn);
+  }
+}
+
+function speakWithVoices(text, voices, micBtn) {
+  console.log('[TTS] Creating utterance with', voices.length, 'voices');
+  
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'en-US';
+  utterance.rate = 1;
+  utterance.pitch = 1;
+  utterance.volume = 1;
+
+  // Select a valid English voice
+  if (voices.length > 0) {
+    const englishVoice = voices.find(voice => 
+      voice.lang.startsWith('en') && voice.localService
+    ) || voices.find(voice => voice.lang.startsWith('en')) || voices[0];
+    
+    if (englishVoice) {
+      utterance.voice = englishVoice;
+      console.log('[TTS] Selected voice:', englishVoice.name, englishVoice.lang);
+    }
+  }
+
+  utterance.onstart = () => {
+    console.log('[TTS] Speech started');
+    if (micBtn) {
+      micBtn.classList.remove('processing');
+      micBtn.classList.add('speaking');
+      micBtn.title = 'Speaking...';
+    }
+  };
+
+  utterance.onend = () => {
+    console.log('[TTS] Speech ended');
+    
+    // Reset speaking flag to allow recognition to resume
+    isSpeaking = false;
+    console.log('[VOICE] Speaking ended (isSpeaking = false)');
+    
+    if (micBtn) {
+      micBtn.classList.remove('processing', 'speaking');
+      micBtn.title = 'Click to start voice input';
+    }
+  };
+
+  utterance.onerror = (event) => {
+    console.error('[TTS] Speech error:', event.error, 'Message:', event.message);
+    
+    // Reset speaking flag on error
+    isSpeaking = false;
+    console.log('[VOICE] Speaking ended due to error (isSpeaking = false)');
+    
+    if (micBtn) {
+      micBtn.classList.remove('processing', 'speaking');
+      micBtn.title = 'Click to start voice input';
+    }
+  };
+
+  utterance.onpause = () => {
+    console.log('[TTS] Speech paused');
+  };
+
+  utterance.onresume = () => {
+    console.log('[TTS] Speech resumed');
+  };
+
+  console.log('[TTS] Calling speechSynthesis.speak()');
+  window.speechSynthesis.speak(utterance);
+  console.log('[TTS] speak() call completed');
+}
+
 // Microphone button with Web Speech API
 function initMicrophone() {
   const micBtn = document.getElementById('mic-btn');
   const travelInput = document.getElementById('travel-request');
 
-  if (!micBtn || !travelInput) return;
-
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    micBtn.style.opacity = '0.5';
-    micBtn.style.cursor = 'not-allowed';
+  if (!micBtn) {
+    console.error('[MIC] mic-btn element not found');
+    return;
+  }
+  if (!travelInput) {
+    console.error('[MIC] travel-request element not found');
     return;
   }
 
-  const recognition = new SpeechRecognition();
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    console.error('[MIC] Speech recognition not supported in this browser');
+    micBtn.style.opacity = '0.5';
+    micBtn.style.cursor = 'not-allowed';
+    micBtn.title = 'Speech recognition not supported in this browser';
+    return;
+  }
+
+  console.log('[MIC] Initializing microphone...');
+
+  recognition = new SpeechRecognition();
   recognition.lang = 'en-US';
-  recognition.continuous = false;
+  recognition.continuous = true;
   recognition.interimResults = true;
+  recognition.maxAlternatives = 1;
+
+  let finalTranscript = '';
+
+  recognition.onstart = () => {
+    console.log('[VOICE] Listening started (isListening = true)');
+    isListening = true;
+    micBtn.classList.add('listening');
+    micBtn.title = 'Listening... (click to stop)';
+  };
 
   recognition.onresult = (event) => {
-    const result = event.results[0];
-    const transcript = result[0].transcript;
-    travelInput.value = transcript;
-    
-    if (result.isFinal) {
-      micBtn.classList.remove('listening');
+    // Ignore recognition results while assistant is speaking
+    if (isSpeaking) {
+      console.log('[VOICE] Ignored recognition during TTS');
+      return;
+    }
+
+    let interimTranscript = '';
+
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const result = event.results[i];
+      const transcript = result[0].transcript;
+
+      if (result.isFinal) {
+        // Prevent duplicate transcript appends
+        if (!finalTranscript.includes(transcript)) {
+          finalTranscript += transcript + ' ';
+          travelInput.value = finalTranscript;
+          console.log('[MIC] Final transcript:', transcript);
+          
+          // Speak natural confirmation after user finishes speaking
+          setTimeout(() => {
+            speakText('Got it. Let me plan that for you.');
+          }, 500);
+        }
+      } else {
+        interimTranscript += transcript;
+      }
+    }
+
+    // Show interim results in real-time
+    if (interimTranscript) {
+      travelInput.value = finalTranscript + interimTranscript;
     }
   };
 
   recognition.onerror = (event) => {
-    console.error('Speech recognition error:', event.error);
+    console.error('[MIC] Recognition error:', event.error);
+    isListening = false;
     micBtn.classList.remove('listening');
+
+    switch (event.error) {
+      case 'no-speech':
+        micBtn.title = 'No speech detected. Try again.';
+        break;
+      case 'audio-capture':
+        micBtn.title = 'Microphone not available.';
+        break;
+      case 'not-allowed':
+        micBtn.title = 'Microphone access denied. Check browser permissions.';
+        break;
+      case 'network':
+        micBtn.title = 'Network error. Check your connection.';
+        break;
+      default:
+        micBtn.title = 'Error occurred. Try again.';
+    }
   };
 
   recognition.onend = () => {
+    console.log('[VOICE] Listening stopped (isListening = false)');
+    isListening = false;
     micBtn.classList.remove('listening');
+    micBtn.title = 'Click to start voice input';
   };
 
   micBtn.addEventListener('click', () => {
-    if (micBtn.classList.contains('listening')) {
+    console.log('[MIC] Microphone button clicked');
+    
+    if (isListening) {
+      console.log('[MIC] Stopping recognition');
       recognition.stop();
       return;
     }
 
-    micBtn.classList.add('listening');
+    // Reset transcript for new session
+    finalTranscript = travelInput.value;
+    if (finalTranscript && !finalTranscript.endsWith(' ')) {
+      finalTranscript += ' ';
+    }
 
     try {
+      console.log('[MIC] Starting recognition');
       recognition.start();
     } catch (error) {
-      console.error('Failed to start recognition:', error);
+      console.error('[MIC] Error starting recognition:', error);
       micBtn.classList.remove('listening');
     }
   });
+
+  console.log('[MIC] Microphone initialized successfully');
 }
 
 // Example chips
@@ -125,6 +445,8 @@ function initGenerateButton() {
 
   generateBtn.addEventListener('click', async () => {
     const request = travelInput.value.trim();
+    
+    console.log('[TRIGGER] Generate button clicked. Request:', request);
     
     if (!request) {
       travelInput.focus();
@@ -200,7 +522,7 @@ const DESTINATION_ITINERARIES = {
     transport: ["JR Pass (7-day)", "Shinkansen Tokyo→Kyoto", "Local metro & buses"],
     lodging: 1100,
     dining: 780,
-    transport: 480,
+    transportCost: 480,
     activities: 400,
     days: [
       {
@@ -237,7 +559,7 @@ const DESTINATION_ITINERARIES = {
     transport: ["BTS Skytrain", "Tuk-tuk for short trips", "Chao Phraya River ferry"],
     lodging: 750,
     dining: 550,
-    transport: 250,
+    transportCost: 250,
     activities: 300,
     days: [
       {
@@ -274,7 +596,7 @@ const DESTINATION_ITINERARIES = {
     transport: ["Leonardo Express train", "Frecciarossa high-speed train", "Local buses & metro"],
     lodging: 1800,
     dining: 1450,
-    transport: 600,
+    transportCost: 600,
     activities: 800,
     days: [
       {
@@ -311,7 +633,7 @@ const DESTINATION_ITINERARIES = {
     transport: ["RER B train from CDG", "Paris Metro", "Bateaux Mouches Seine cruise"],
     lodging: 1400,
     dining: 950,
-    transport: 350,
+    transportCost: 350,
     activities: 500,
     days: [
       {
@@ -348,7 +670,7 @@ const DESTINATION_ITINERARIES = {
     transport: ["Public transit", "Local shuttle", "Walking", "Taxi as needed"],
     lodging: 1200,
     dining: 750,
-    transport: 500,
+    transportCost: 500,
     activities: 400,
     days: [
       {
@@ -384,7 +706,31 @@ const DESTINATION_ITINERARIES = {
 
 // Run agent workflow
 async function runAgentWorkflow(request) {
+  console.log('[WORKFLOW] runAgentWorkflow called with request:', request);
+  
   const parsed = parseTravelRequest(request);
+  console.log('[WORKFLOW] Parsed request:', parsed);
+  
+  // Set processing state
+  isProcessing = true;
+  console.log('[VOICE] Processing started (isProcessing = true)');
+  
+  const micBtn = document.getElementById('mic-btn');
+  if (micBtn) {
+    micBtn.classList.add('processing');
+    micBtn.title = 'Processing...';
+  }
+  
+  // Show loading state
+  const itineraryLoading = document.getElementById('itinerary-loading');
+  const itineraryAccordion = document.getElementById('itinerary-accordion');
+  if (itineraryLoading) {
+    itineraryLoading.style.display = 'flex';
+    console.log('[UI] Loading started');
+  }
+  if (itineraryAccordion) {
+    itineraryAccordion.style.display = 'none';
+  }
   
   // Show workflow section
   const workflowSection = document.getElementById('workflow-section');
@@ -415,9 +761,44 @@ async function runAgentWorkflow(request) {
   
   // Display itinerary
   displayItinerary(parsed);
+  console.log('[UI] Itinerary rendered');
+
+  // Hide loading state and show itinerary
+  if (itineraryLoading) {
+    itineraryLoading.style.display = 'none';
+  }
+  if (itineraryAccordion) {
+    itineraryAccordion.style.display = 'block';
+  }
+
+  // Reset processing state
+  isProcessing = false;
+  console.log('[VOICE] Processing ended (isProcessing = false)');
+  
+  if (micBtn) {
+    micBtn.classList.remove('processing');
+  }
+
+  // Smooth scroll to itinerary section
+  const itinerarySection = document.getElementById('itinerary-section');
+  if (itinerarySection) {
+    console.log('[UI] Smooth scroll initiated');
+    itinerarySection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
+    // Wait for scroll to complete before speaking
+    setTimeout(() => {
+      console.log('[UI] Scroll completed');
+      
+      // Speak concise itinerary summary after scroll
+      const speechText = `Your ${parsed.duration}-day ${parsed.destination} itinerary is ready. You'll explore amazing destinations with an estimated budget of ${formatCurrency(parsed.budget)}. I've prepared the full day-by-day plan below.`;
+      speakText(speechText);
+    }, 800);
+  }
 }
 
 function displayItinerary(parsed) {
+  console.log('[DISPLAY] displayItinerary called with parsed:', parsed);
+  
   const destLower = parsed.destination.toLowerCase();
   let template = DESTINATION_ITINERARIES.generic;
   
@@ -431,11 +812,15 @@ function displayItinerary(parsed) {
     template = DESTINATION_ITINERARIES.france;
   }
   
+  console.log('[DISPLAY] Template selected:', template);
+  console.log('[DISPLAY] Template days:', template.days);
+  console.log('[DISPLAY] Template days length:', template.days.length);
+  
   // Calculate budget
   const dayRatio = parsed.duration / 3;
   let lodging = template.lodging * dayRatio;
   let dining = template.dining * dayRatio;
-  let transport = template.transport * (dayRatio * 0.5 + 0.5);
+  let transport = template.transportCost * (dayRatio * 0.5 + 0.5);
   let activities = template.activities * dayRatio;
   
   let total = lodging + dining + transport + activities;
@@ -473,7 +858,8 @@ function displayItinerary(parsed) {
   }
   
   // Show output section
-  document.getElementById('output-section').style.display = 'block';
+  const outputSection = document.getElementById('output-section');
+  outputSection.style.display = 'block';
   
   // Update trip summary
   document.getElementById('trip-destination').textContent = parsed.destination;
@@ -497,11 +883,19 @@ function displayItinerary(parsed) {
   
   // Update itinerary accordion
   const itineraryAccordion = document.getElementById('itinerary-accordion');
+  console.log('[DISPLAY] itineraryAccordion element:', itineraryAccordion);
+  if (!itineraryAccordion) {
+    console.error('itinerary-accordion element not found');
+    return;
+  }
   itineraryAccordion.innerHTML = '';
+  console.log('[DISPLAY] Cleared accordion innerHTML');
+  console.log('[DISPLAY] Loop start: parsed.duration =', parsed.duration);
   
   for (let i = 1; i <= parsed.duration; i++) {
     const dayDataIndex = (i - 1) % template.days.length;
     const dayData = template.days[dayDataIndex];
+    console.log('[DISPLAY] Loop iteration', i, 'dayDataIndex:', dayDataIndex, 'dayData:', dayData);
     
     const accordionItem = document.createElement('div');
     accordionItem.className = 'accordion-item';
@@ -519,6 +913,8 @@ function displayItinerary(parsed) {
         </div>
       `;
     }).join('');
+    
+    console.log('[DISPLAY] activitiesHTML for day', i, ':', activitiesHTML);
     
     accordionItem.innerHTML = `
       <div class="accordion-header">
@@ -554,10 +950,18 @@ function displayItinerary(parsed) {
     // Open first item by default
     if (i === 1) {
       accordionItem.classList.add('open');
+      console.log('[DISPLAY] Added "open" class to first accordion item');
     }
     
+    console.log('[DISPLAY] Appending accordion item for day', i);
     itineraryAccordion.appendChild(accordionItem);
   }
+  
+  console.log('[DISPLAY] Loop completed. Final accordion innerHTML length:', itineraryAccordion.innerHTML.length);
+  console.log('[DISPLAY] Final accordion innerHTML:', itineraryAccordion.innerHTML);
+  
+  // Initialize map after itinerary renders
+  initMap(parsed.destination);
   
   // Update validation
   document.getElementById('validation-score').textContent = '95%';
@@ -572,9 +976,6 @@ function displayItinerary(parsed) {
   ].filter(v => v.trim());
   
   validationDetails.innerHTML = validations.map(v => `<div class="validation-item">${v}</div>`).join('');
-  
-  // Scroll to output
-  document.getElementById('output-section').scrollIntoView({ behavior: 'smooth' });
 }
 
 function sleep(ms) {
